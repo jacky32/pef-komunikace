@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#0f172a"/>
+  <!-- grid dots -->
+  <circle cx="6"  cy="6"  r="2" fill="#475569"/>
+  <circle cx="16" cy="6"  r="2" fill="#475569"/>
+  <circle cx="26" cy="6"  r="2" fill="#475569"/>
+  <circle cx="6"  cy="16" r="2" fill="#475569"/>
+  <circle cx="16" cy="16" r="2" fill="#475569"/>
+  <circle cx="26" cy="16" r="2" fill="#475569"/>
+  <circle cx="6"  cy="26" r="2" fill="#475569"/>
+  <circle cx="16" cy="26" r="2" fill="#475569"/>
+  <circle cx="26" cy="26" r="2" fill="#475569"/>
+  <!-- connected path: top-left → right → down → right → bottom-right -->
+  <polyline points="6,6 26,6 26,16 6,16 6,26 26,26"
+            fill="none" stroke="#22c55e" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- start node -->
+  <circle cx="6"  cy="6"  r="3" fill="#3b82f6"/>
+  <!-- end node -->
+  <circle cx="26" cy="26" r="3" fill="#22c55e"/>
+</svg>

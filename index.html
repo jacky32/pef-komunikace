@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Komunikační Spojovatel PEF</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- INTRO SCREEN -->
+  <div id="screen-intro" class="screen active">
+    <div class="intro-card">
+      <div class="logo-ring">
+        <svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true">
+          <circle cx="40" cy="40" r="36" stroke="#3b82f6" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+          <circle cx="40" cy="40" r="20" stroke="#22c55e" stroke-width="3" fill="none"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="#64748b" stroke-width="2"/>
+          <line x1="4" y1="40" x2="76" y2="40" stroke="#64748b" stroke-width="2"/>
+        </svg>
+      </div>
+      <h1 class="game-title">Komunikační<br/>Spojovatel PEF</h1>
+      <p class="game-meta">
+        <span class="game-id">pef_komunikace_spojovatel</span>
+        &nbsp;·&nbsp;
+        <span class="game-author">Patrik Broniek</span>
+      </p>
+      <p class="game-intro-text">
+        Vítejte v simulátoru digitální komunikace PEF.<br/>
+        Vaším úkolem je propojit uzly sítě dříve,<br/>
+        než vyprší timeout.
+      </p>
+      <div class="input-group">
+        <label for="player-name">Vaše jméno</label>
+        <input
+          type="text"
+          id="player-name"
+          placeholder="Zadejte jméno hráče…"
+          maxlength="40"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <div id="local-pb-intro" class="local-pb hidden"></div>
+      <button id="btn-start" class="btn btn-primary" disabled>Spustit hru</button>
+      <button id="btn-show-lb" class="btn btn-outline">Zobrazit žebříček</button>
+      <div id="intro-error" class="error-msg hidden"></div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <div id="offline-banner" class="offline-banner hidden">
+      Offline režim – skóre nebude započítáno do serverového žebříčku.
+    </div>
+    <header class="game-header">
+      <div class="header-left">
+        <span class="header-title">Komunikační Spojovatel PEF</span>
+      </div>
+      <div class="header-center">
+        <div class="timer-wrap">
+          <span class="timer-label">ČAS</span>
+          <span id="timer-display" class="timer-display">00:00.000</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div id="local-pb-header" class="local-pb-header hidden"></div>
+        <button id="btn-new-game-header" class="btn btn-sm btn-outline">Nová hra</button>
+      </div>
+    </header>
+
+    <main class="game-main">
+      <div class="grid-wrap">
+        <div id="grid" class="grid" role="grid" aria-label="Herní mřížka"></div>
+      </div>
+      <div class="hint-bar">
+        <span class="hint-dot dot-start"></span><span>START [0,0]</span>
+        <span class="hint-dot dot-goal"></span><span>CÍL [9,9]</span>
+        <span class="hint-dot dot-conn"></span><span>Spojeno</span>
+      </div>
+    </main>
+  </div>
+
+  <!-- WIN OVERLAY -->
+  <div id="overlay-win" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="win-title">
+    <div class="overlay-card">
+      <div class="win-icon" aria-hidden="true">
+        <svg viewBox="0 0 60 60" width="60" height="60">
+          <circle cx="30" cy="30" r="28" stroke="#22c55e" stroke-width="3" fill="none"/>
+          <polyline points="16,30 26,42 46,20" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 id="win-title" class="overlay-title">Úspěch!</h2>
+      <p class="overlay-subtitle">Komunikace byla navázána!</p>
+      <div class="win-time-block">
+        <span class="win-time-label">Váš čas</span>
+        <span id="win-time-display" class="win-time-value">—</span>
+      </div>
+      <div id="win-new-pb" class="new-pb-badge hidden">Nový osobní rekord!</div>
+      <button id="btn-submit-score" class="btn btn-primary">Odeslat skóre</button>
+      <div id="win-offline-note" class="offline-note hidden">Offline režim – skóre se neuloží na server.</div>
+      <div id="submit-error" class="error-msg hidden"></div>
+      <button id="btn-new-game-win" class="btn btn-outline">Nová hra</button>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD OVERLAY -->
+  <div id="overlay-leaderboard" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="lb-title">
+    <div class="overlay-card overlay-card-wide">
+      <h2 id="lb-title" class="overlay-title">Žebříček hráčů</h2>
+      <div id="lb-your-position" class="lb-your-position hidden"></div>
+      <div id="lb-local-section" class="lb-local-section hidden"></div>
+      <div id="lb-server-label" class="lb-server-label hidden">Serverový žebříček</div>
+      <div class="lb-table-wrap">
+        <table class="lb-table" aria-label="Leaderboard top 10">
+          <thead>
+            <tr>
+              <th>Pořadí</th>
+              <th>Hráč</th>
+              <th>Čas</th>
+              <th>Datum</th>
+            </tr>
+          </thead>
+          <tbody id="lb-body"></tbody>
+        </table>
+        <div id="lb-empty" class="lb-empty hidden">Žádné záznamy zatím.</div>
+        <div id="lb-offline" class="lb-offline hidden">
+          Žebříček není dostupný v offline režimu.
+        </div>
+      </div>
+      <button id="btn-new-game-lb" class="btn btn-primary" style="margin-top:1.5rem">Nová hra</button>
+    </div>
+  </div>
+
+  <!-- ERROR OVERLAY (network) -->
+  <div id="overlay-error" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="err-title">
+    <div class="overlay-card">
+      <div class="err-icon" aria-hidden="true">
+        <svg viewBox="0 0 60 60" width="60" height="60">
+          <circle cx="30" cy="30" r="28" stroke="#ef4444" stroke-width="3" fill="none"/>
+          <line x1="20" y1="20" x2="40" y2="40" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+          <line x1="40" y1="20" x2="20" y2="40" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 id="err-title" class="overlay-title overlay-title-err">Chyba</h2>
+      <p id="err-message" class="overlay-subtitle">Spojení ztraceno – komunikační šum je příliš vysoký.</p>
+      <button id="btn-err-retry" class="btn btn-outline">Zkusit znovu</button>
+      <button id="btn-err-new" class="btn btn-outline" style="margin-top:.5rem">Nová hra</button>
+    </div>
+  </div>
+
+  <script src="game.js" defer></script>
+</body>
+</html>
